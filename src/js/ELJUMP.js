@@ -1,17 +1,25 @@
-// Initialize the Material Design components
-mdc.autoInit();
+// set needed CSS for the document
+$('main').css({"padding-left":"16px", "overflow":"auto"});
+$('body').css({"display":"flex", "flex-direction":"row", "padding":"0", "margin":"0", "box-sizing":"border-box", "height":"100%", "width":"100%"});
+$('html').css("height", "100%");
 
+// A unique ID is required for instantiation. 
+// Supported Drawer Types are: "Temporary", "Persistent", "Permanent Above" and "Permanent Below".
 class NavDrawer {
-    constructor(TitleText, ID, Type) {
-      this.TitleText = TitleText;
-      this.ID = ID;
-      this.Object = null;
-      this.MDCDrawer = null;
-      if (typeof(Type) === "undefined") {
-        this.Type = "Temporary";
-      } else {
-        this.Type = Type;
-      }
+    constructor(ID, Type) {
+        this.Label = "Title Text";
+        this.ID = ID;
+        this.ParentID = ""
+        this.PermanentAboveToolbar = true;
+        this.Identifier = "Navigation Drawer";
+        this.Object = null;
+        this.NavObject = null;
+        this.MDCDrawer = null;
+        if (typeof(Type) === "undefined") {
+            this.Type = "Temporary";
+        } else {
+            this.Type = Type;
+        }
     };
 
     // Creates the Nav Drawer.
@@ -20,51 +28,80 @@ class NavDrawer {
             // Checks which version of a nav needs to be created.
             switch (this.Type.toString()) {
                 default:
+                    // The default is the temporary drawer.
                     this.Type = "Temporary";
-                // The default is the temporary drawer.
                 case "Temporary":
-                    var $aside = $('<aside>', {id: this.ID.toString(), "class": "mdc-temporary-drawer"});
-                    var $navTopLvL = $("<nav>", {"class": "mdc-temporary-drawer__drawer"});
-                    var $header = $("<header>", {"class": "mdc-temporary-drawer__header mdc-theme--primary-bg mdc-theme--text-primary-on-primary"});
-                    var $headerContent = $("<div>", {"class": "mdc-temporary-drawer__header-content"}).text(this.TitleText.toString());
-                    var $navMenu = $("<nav>", {"class": "mdc-temporary-drawer__content mdc-list", id: this.ID.toString() + "-nav-menu"});
-        
-                    $('body').prepend($aside.append($navTopLvL.append($header.append($headerContent), $navMenu)));
+                    // Create and configure the elements.
+                    var $MainElement = $('<aside>', {id: this.ID.toString(), "class": "mdc-temporary-drawer"});
+                    var $NavTopLvL = $("<nav>", {"class": "mdc-temporary-drawer__drawer"});
+                    var $Header = $("<header>", {"class": "mdc-temporary-drawer__header mdc-theme--primary-bg mdc-theme--text-primary-on-primary"});
+                    var $HeaderContent = $("<div>", {"class": "mdc-temporary-drawer__header-content"}).text(this.Label.toString());
+                    var $MenuContainer = $("<nav>", {"class":"mdc-temporary-drawer__content mdc-list-group"});
+                    var $NavMenu = $("<div>", {"class": "mdc-list", id: this.ID.toString() + "-nav-menu"});
+                    var AppendTo = (this.ParentID !== "") ? this.ParentID.toString() : "body";
+
+                    // Send the elements to the document for rendering.
+                    $(AppendTo).prepend($MainElement.append($NavTopLvL.append($Header.append($HeaderContent), $MenuContainer.append($NavMenu))));
+
+                    // Instantiate the MDC component on the nav drawer to make interactive.
                     this.MDCDrawer = new mdc.drawer.MDCTemporaryDrawer($('#' + this.ID.toString())[0]);
-            
-                    this.Object = $aside;
+
+                    // Make the main objects externally available.
+                    this.Object = $MainElement;
+                    this.NavObject = $NavMenu;
                     break;
                 case "Persistent":
-                    var $aside = $('<aside>', {id: this.ID.toString(), "class": "mdc-persistent-drawer"});
-                    var $navTopLvL = $("<nav>", {"class": "mdc-persistent-drawer__drawer"});
-                    var $spacer = $('<div>', {"class": "mdc-persistent-drawer__toolbar-spacer"});
-                    var $listGroup = $("<div>", {"class": "mdc-list-group"});
-                    var $listContent = $("<nav>", {"class": "mdc-list"});
-                    var $listDivider = $("<hr>", {"class": "mdc-list-divider"});
-                    var $listContent2 = $("<nav>", {"class": "mdc-list"});
+                    // Create and configure the elements.
+                    var $MainElement = $('<aside>', {id: this.ID.toString(), "class" : "mdc-persistent-drawer"});
+                    var $NavTopLvL = $('<nav>', {"class":"mdc-persistent-drawer__drawer"});
+                    var $Spacer = $('<div>', {"class":"mdc-persistent-drawer__toolbar-spacer"});
+                    var $NavContainer = $('<div>', {"class":"mdc-list-group"});
+                    var $NavMenu = $('<nav>', {"class":"mdc-list", id: this.ID.toString() + "-nav-menu"});
+                    var AppendTo = (this.ParentID !== "") ? this.ParentID.toString() : "body";
 
-                    $('body').prepend($aside.append($navTopLvL.append($spacer, $listGroup.append($listContent, $listDivider, $listContent2))));
+                    // Send the elements to the document for rendering.
+                    $(AppendTo).prepend($MainElement.append($NavTopLvL.append($Spacer), $NavContainer.append($NavMenu)));
+
+                    // Instantiate the MDC component on the nav drawer to make interactive.
                     this.MDCDrawer = new mdc.drawer.MDCPersistentDrawer($('#' + this.ID.toString())[0]);
-                    this.Object = $aside;
 
-                    var $item1 = $('<a>', {href: "#", "class": "mdc-list-item"}).text("Send Mail");
-                    var $item1meta = $('<i>', {"class": "material-icons mdc-list-item__start-detail"}).text("send");
-                    $item1.prepend($item1meta.attr("aria-hidden", "true"));
-                    $listContent.append($item1);
-
-                    var $item2 = $('<a>', {href: "#", "class": "mdc-list-item"}).text("Drafts");
-                    var $item2meta = $('<i>', {"class": "material-icons mdc-list-item__start-detail"}).text("drafts");
-                    $item2.prepend($item1meta.attr("aria-hidden", "true"));
-                    $listContent2.append($item2);
-                    
+                    // Make the main objects externally available.
+                    this.Object = $MainElement;
+                    this.NavObject = $NavMenu;
                     break;
                 case "Permanent Above":
+                    // Create and configure the elements.
+                    var $MainElement = $('<nav>', {id: this.ID.toString(), "class": "mdc-permanent-drawer"});
+                    var $Spacer = $('<div>', {"class":"mdc-permanent-drawer__toolbar-spacer"});
+                    var $MenuContainer = $('<div>', {"class":"mdc-list-group"});
+                    var $NavMenu = $('<nav>', {"class":"mdc-list", id: this.ID.toString() + "-nav-menu"});
+                    var AppendTo = (this.ParentID !== "") ? this.ParentID.toString() : "body";
+
+                    // Send the elements to the document for rendering.
+                    $(AppendTo).prepend($MainElement.append($Spacer, $MenuContainer.append($NavMenu)));
+
+                    // Make the main objects externally available.
+                    this.Object = $MainElement;
+                    this.NavObject = $NavMenu;
                     break;
                 case "Permanent Below":
+                    // Create and configure the elements.
+                    var $MainElement = $('<nav>', {id: this.ID.toString(), "class": "mdc-permanent-drawer"});
+                    var $MenuContainer = $('<div>', {"class":"mdc-list-group"});
+                    var $NavMenu = $('<nav>', {"class":"mdc-list", id: this.ID.toString() + "-nav-menu"});
+                    var AppendTo = (this.ParentID !== "") ? this.ParentID.toString() : "body";
+
+                    // Send the elements to the document for rendering.
+                    $(AppendTo).prepend($MainElement.append($MenuContainer.append($NavMenu)));
+
+                    // Make the main objects externally available.
+                    this.Object = $MainElement;
+                    this.NavObject = $NavMenu;
                     break;
             }
             return true;
         } else {
+            console.error("There is already an object here. Are you reusing the same instance of the NavDrawer class?");
             return false;
         }
     }
@@ -76,8 +113,31 @@ class NavDrawer {
             this.Object.remove();
             this.Object = null;
             this.MDCDrawer = null;
+            this.NavObject = null;
             return true;
         } else {
+            return false;
+        }
+    }
+
+    // Attaches a Menu Item object to the menu.
+    AttachMenuItem(MenuItem) {
+        if (MenuItem.Identifier === "Menu Item") {
+            $(this.NavObject).append(MenuItem.Object);
+            return true;
+        } else {
+            console.error("Please attach a MenuItem object!");
+            return false;
+        }
+    }
+
+    // Removes a Menu Item object from the menu.
+    RemoveMenuItem(MenuItem) {
+        if (MenuItem.Identifier === "Menu Item") {
+            $(this.NavObject).remove(MenuItem.Object);
+            return true;
+        } else {
+            console.error("Please remove a MenuItem object!");
             return false;
         }
     }
@@ -97,13 +157,24 @@ class NavDrawer {
             return false;
         }
     }
-  }
+}
+
+class MenuItem {
+    constructor() {
+        this.Label = "";
+        this.Icon = "";
+        this.Identifier = "Menu Item";
+        this.Object = null;
+    }
+
+}
 
 class Toolbar {
-    constructor(TitleText, ID, Type) {
-        this.TitleText = "Toolbar!";
+    constructor(Label, ID, Type) {
+        this.Label = "Toolbar!";
         this.ID = ID;
         this.Type = Type;
+        this.Identifier = "Toolbar";
         this.Object = null;
     }
 
