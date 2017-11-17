@@ -10,7 +10,6 @@ class NavDrawer {
         this.Label = "Title Text";
         this.ID = ID;
         this.ParentID = ""
-        this.PermanentAboveToolbar = true;
         this.Object = null;
         this.NavObject = null;
         this.MDCDrawer = null;
