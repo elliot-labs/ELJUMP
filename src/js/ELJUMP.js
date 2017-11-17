@@ -11,7 +11,6 @@ class NavDrawer {
         this.ID = ID;
         this.ParentID = ""
         this.PermanentAboveToolbar = true;
-        this.Identifier = "Navigation Drawer";
         this.Object = null;
         this.NavObject = null;
         this.MDCDrawer = null;
@@ -106,9 +105,10 @@ class NavDrawer {
         }
     }
 
-    // Returns true if successful.
-    // Returns false if unsuccessful.
+    // Remove the Nav Drawer.
     Remove() {
+        // Only execute if the MenuItem has been created.
+        // Throw an error if it does not exist.
         if (this.Object !== null) {
             this.Object.remove();
             this.Object = null;
@@ -116,13 +116,14 @@ class NavDrawer {
             this.NavObject = null;
             return true;
         } else {
+            console.error("Can't remove the NavDrawer, it most likely does not exist.");
             return false;
         }
     }
 
     // Attaches a Menu Item object to the menu.
     AttachMenuItem(MenuItem) {
-        if (MenuItem.Identifier === "Menu Item") {
+        if (MenuItem.Identifier() === "Menu Item") {
             $(this.NavObject).append(MenuItem.Object);
             return true;
         } else {
@@ -157,31 +158,96 @@ class NavDrawer {
             return false;
         }
     }
+
+    // A method that returns the type of the Class.
+    Identifier() {
+        return "Navigation Drawer";
+    }
 }
 
 class MenuItem {
-    constructor() {
-        this.Label = "";
-        this.Icon = "";
-        this.Identifier = "Menu Item";
+    // Sets up the class with the default values.
+    constructor(ID, Label, Icon) {
+        this.Label = Label;
+        this.Icon = Icon;
+        this.ID = ID;
+        this.ParentID = "";
         this.Object = null;
     }
 
+    // Create a Menu Item Instance.
+    Create() {
+        if (this.Object == null) {
+            // Create the HTML elements 
+            let $MainElement = $('<a>', {"class" : "mdc-list-item"}).text(this.Label);
+            let $IconElement = $('<i>', {"class" : "material-icons mdc-list-item__start-detail"}).text(this.Icon);
+
+            // If the ID attribute has been set, apply it.
+            if (this.ID !== undefined) {
+                $MainElement.attr("id",this.ID.toString()); 
+            }
+
+            // If a parent ID is specified, attach it there, otherwise just create the object.
+            if (this.ParentID === "") {
+                $MainElement.prepend($IconElement);
+            } else {
+                $('#' + this.ParentID.toString()).append($MainElement.prepend($IconElement));
+            }
+
+            // Set the Object property with the results of the above code.
+            this.Object = $MainElement;
+            return true;   
+        } else {
+            // Spit out an error if something went wrong.
+            console.error("There is already an object here. Are you reusing the same instance of the MenuItem class?");
+            return false;
+        }
+    }
+
+    // Remove the Menu Item.
+    Remove() {
+        // Only execute if the MenuItem has been created.
+        // Throw an error if it does not exist.
+        if (this.Object !== null) {
+            this.Object.Remove();
+            this.Object = null;
+            return true;
+        } else {
+            console.error("Can't remove the NavDrawer, it most likely does not exist.");
+            return false;
+        }
+    }
+
+    // A method that returns the type of the Class.
+    Identifier() {
+        return "Menu Item";
+    }
 }
 
 class Toolbar {
-    constructor(Label, ID, Type) {
+    constructor(ID, Type, Label) {
         this.Label = "Toolbar!";
         this.ID = ID;
         this.Type = Type;
-        this.Identifier = "Toolbar";
         this.Object = null;
     }
 
     // Creates the Toolbar.
     Create() {
         if (this.Object === null) {
-            // Create toolbar here
+            // pass
         }
+    }
+
+    // Remove the Toolbar.
+    Remove() {
+        if (this.Object !== null) {
+            // Pass
+        }
+    }
+
+    // A method that returns the type of the Class.
+    Identifier() {
+        return "Toolbar";
     }
 }
