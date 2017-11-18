@@ -8,16 +8,12 @@ $('html').css("height", "100%");
 class NavDrawer {
     constructor(ID, Type) {
         this.Label = "Title Text";
-        this.ID = ID;
+        this.ID = (typeof(ID) === "undefined") ? "NavDrawer" : ID;
         this.ParentID = ""
         this.Object = null;
         this.NavObject = null;
         this.MDCDrawer = null;
-        if (typeof(Type) === "undefined") {
-            this.Type = "Temporary";
-        } else {
-            this.Type = Type;
-        }
+        this.Type = (typeof(Type) === "undefined") ? this.Type = "Temporary" : this.Type = Type;
     };
 
     // Creates the Nav Drawer.
@@ -121,9 +117,13 @@ class NavDrawer {
     }
 
     // Attaches a Menu Item object to the menu.
-    AttachMenuItem(MenuItem) {
+    // Add a ripple to the new menu item if the second parameter is true.
+    AttachMenuItem(MenuItem, RippleBool) {
         if (MenuItem.Identifier() === "Menu Item") {
             $(this.NavObject).append(MenuItem.Object);
+            if (RippleBool) {
+                mdc.ripple.MDCRipple.attachTo(MenuItem.Object[0]);
+            } 
             return true;
         } else {
             console.error("Please attach a MenuItem object!");
@@ -133,8 +133,8 @@ class NavDrawer {
 
     // Removes a Menu Item object from the menu.
     RemoveMenuItem(MenuItem) {
-        if (MenuItem.Identifier === "Menu Item") {
-            $(this.NavObject).remove(MenuItem.Object);
+        if (MenuItem.Identifier() === "Menu Item") {
+            MenuItem.Object.remove();
             return true;
         } else {
             console.error("Please remove a MenuItem object!");
@@ -167,9 +167,11 @@ class NavDrawer {
 class MenuItem {
     // Sets up the class with the default values.
     constructor(ID, Label, Icon) {
-        this.Label = Label;
-        this.Icon = Icon;
-        this.ID = ID;
+        this.Label = (typeof(Label) === "undefined") ? "Menu Item" : Label.toString();
+        this.Icon = (typeof(Icon) === "undefined") ? "receipt" : Icon.toString();
+        this.ID = (typeof(ID) === "undefined") ? "" : ID.toString();
+        this.HREF = "";
+        this.OnClick = "";
         this.ParentID = "";
         this.Object = null;
     }
@@ -182,8 +184,18 @@ class MenuItem {
             let $IconElement = $('<i>', {"class" : "material-icons mdc-list-item__start-detail"}).text(this.Icon);
 
             // If the ID attribute has been set, apply it.
-            if (this.ID !== undefined) {
-                $MainElement.attr("id",this.ID.toString()); 
+            if (this.ID !== "") {
+                $MainElement.attr("id", this.ID); 
+            }
+
+            // Change the URL of the Menu Item if it is not blank.
+            if (this.HREF !== "") {
+                $MainElement.attr("href", this.HREF.toString());
+            }
+
+            // Add an HTML onclick attribute to the main element.
+            if (this.OnClick !== "") {
+                $MainElement.attr("onclick", this.OnClick.toString());
             }
 
             // If a parent ID is specified, attach it there, otherwise just create the object.
@@ -208,11 +220,22 @@ class MenuItem {
         // Only execute if the MenuItem has been created.
         // Throw an error if it does not exist.
         if (this.Object !== null) {
-            this.Object.Remove();
+            this.Object.remove();
             this.Object = null;
             return true;
         } else {
             console.error("Can't remove the NavDrawer, it most likely does not exist.");
+            return false;
+        }
+    }
+
+    // Manually create a ripple effect on the Menu Item Object.
+    ManualRipple() {
+        if (this.Object !== null) {
+            mdc.ripple.MDCRipple.attachTo(this.Object);
+            return true;
+        } else {
+            console.error("Can't instantiate a ripple. Has the item been created yet?")
             return false;
         }
     }
@@ -226,7 +249,7 @@ class MenuItem {
 class Toolbar {
     constructor(ID, Type, Label) {
         this.Label = "Toolbar!";
-        this.ID = ID;
+        this.ID = (typeof(ID) === "undefined") ? "" : ID;
         this.Type = Type;
         this.Object = null;
     }
