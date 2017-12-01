@@ -119,7 +119,7 @@ class NavDrawer {
     // Attaches a Menu Item object to the menu.
     // Add a ripple to the new menu item if the second parameter is true.
     AttachMenuItem(MenuItem, RippleBool) {
-        if (MenuItem.Identifier() === "Menu Item") {
+        if (MenuItem.constructor.name === "MenuItem") {
             $(this.NavObject).append(MenuItem.Object);
             if (RippleBool) {
                 mdc.ripple.MDCRipple.attachTo(MenuItem.Object[0]);
