@@ -157,11 +157,6 @@ class NavDrawer {
             return false;
         }
     }
-
-    // A method that returns the type of the Class.
-    Identifier() {
-        return "Navigation Drawer";
-    }
 }
 
 class MenuItem {
@@ -239,11 +234,6 @@ class MenuItem {
             return false;
         }
     }
-
-    // A method that returns the type of the Class.
-    Identifier() {
-        return "Menu Item";
-    }
 }
 
 class Toolbar {
@@ -266,10 +256,5 @@ class Toolbar {
         if (this.Object !== null) {
             // Pass
         }
-    }
-
-    // A method that returns the type of the Class.
-    Identifier() {
-        return "Toolbar";
     }
 }
