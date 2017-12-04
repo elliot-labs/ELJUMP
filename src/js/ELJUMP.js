@@ -5,6 +5,7 @@ $('body').css({"display":"flex", "flex-direction":"row", "padding":"0", "margin"
 // A unique ID is required for instantiation. 
 // Supported drawer types are: "Temporary", "Persistent", "Permanent Above" and "Permanent Below".
 class NavDrawer {
+    // Sets up the class with the default values.
     constructor(ID, Type) {
         this.Label = "Title Text";
         this.ID = (typeof(ID) === "undefined") ? "NavDrawer" : ID;
@@ -110,7 +111,7 @@ class NavDrawer {
             this.NavObject = null;
             return true;
         } else {
-            console.error("Can't remove the NavDrawer, it most likely does not exist.");
+            console.error("Can't remove the NavDrawer, it does not exist...");
             return false;
         }
     }
@@ -154,6 +155,7 @@ class NavDrawer {
     }
 }
 
+// Creates a menu item for the nav drawer.
 class MenuItem {
     // Sets up the class with the default values.
     constructor(ID, Label, Icon) {
@@ -165,10 +167,12 @@ class MenuItem {
         this.OnClick = "";
         this.ParentID = "";
         this.Object = null;
+        this.MDCObject = null;
     }
 
     // Create a Menu Item Instance.
     Create() {
+        // Only execute if the object has not been created.
         if (this.Object == null) {
             // Create the HTML elements 
             let $MainElement = $('<a>', {"class" : "mdc-list-item"}).text(this.Label);
@@ -205,24 +209,38 @@ class MenuItem {
 
     // Remove the Menu Item.
     Remove() {
-        // Only execute if the MenuItem has been created.
-        // Throw an error if it does not exist.
+        // Only execute if the object has been created.
         if (this.Object !== null) {
+            // Remove the object from the DOM.
             this.Object.remove();
+            // Reset the properties for a new creation of the menu item.
             this.Object = null;
+            this.MDCObject = null;
+            // Return true for error checking.
             return true;
         } else {
-            console.error("Can't remove the NavDrawer, it most likely does not exist.");
+            // If the object has not been instantiated, quit execution and give reason.
+            console.error("Can't remove the menu item, it does not exist yet...");
             return false;
         }
     }
 
     // Manually create a ripple effect on the Menu Item Object.
     ManualRipple() {
+        // Only execute if the object has been created.
         if (this.Object !== null) {
-            mdc.ripple.MDCRipple.attachTo(this.Object[0]);
-            return true;
+            // only execute if MDC has not been enabled on the object yet.
+            if (this.MDCObject === null) {
+                // Create ripple on the object and save it to the class MDC object property.
+                this.MDCObject = mdc.ripple.MDCRipple.attachTo(this.Object[0]);
+                return true;
+            } else {
+                // If the MDC object has been instantiated, quit execution and give reason.
+                console.error("The MDC component is already initialized. Not applying the ripple for safety...");
+                return false;
+            }
         } else {
+            // If the Object has not been instantiated, quit reason and give the reason.
             console.error("Can't instantiate a ripple. The menu item has not been created yet...")
             return false;
         }
@@ -232,6 +250,7 @@ class MenuItem {
 // A unique ID is required for instantiation. 
 // Supported toolbar types are: "Fixed", "Waterfall", "Waterfall Flexible" and "Waterfall Fix Last Row".
 class Toolbar {
+    // Sets up the class with the default values.
     constructor(ID, Type, Title) {
         this.Title = (typeof(Title) === "undefined") ? "" : Title;
         this.Label = "";
@@ -245,6 +264,7 @@ class Toolbar {
 
     // Creates the Toolbar.
     Create() {
+        // Only execute if the object has not been created.
         if (this.Object === null) {
             $("main").addClass("mdc-toolbar-fixed-adjust");
 
@@ -266,6 +286,8 @@ class Toolbar {
                 $LeftSection.addClass("mdc-toolbar__section--shrink-to-fit");
                 $RightSection.addClass("mdc-toolbar__section--shrink-to-fit");
             }
+
+            // Get the parent element and make accessible.
             var ParentElement = (this.ParentID !== "") ? this.ParentID.toString() : "body";
             $(ParentElement).prepend($MainElement.append($ToolbarRow.append($LeftSection, $CenterSection, $RightSection)));
 
@@ -274,7 +296,7 @@ class Toolbar {
                 default:
                     // The default is the Waterfall Toolbar.
                     this.Type = "Waterfall";
-                    console.error("Please specify a valid toolbar type! Defaulting to \"Waterfall\".");
+                    console.error('The specified type does not exist: ' + this.Type.toString() + ', defaulting to "Waterfall".');
                 case "Waterfall":
                     $MainElement.addClass("mdc-toolbar--fixed mdc-toolbar--waterfall");
                     break;
@@ -291,6 +313,7 @@ class Toolbar {
             this.Object = $MainElement;
             return true;
         } else {
+            // If the object has been instantiated, quit execution and give reason.
             console.error("Could not create, It appears that the toolbar has already been created.");
             return false;
         }
@@ -298,6 +321,7 @@ class Toolbar {
 
     // Remove the Toolbar.
     Remove() {
+        // Only execute if the object has been created.
         if (this.Object !== null) {
             $("main").removeClass("mdc-toolbar-fixed-adjust");
             this.Object.remove();
@@ -338,6 +362,139 @@ class Toolbar {
             return true;
         } else {
             console.error("Could not attach new item, the toolbar has not been created yet...");
+            return false;
+        }
+    }
+}
+
+// A unique ID is not required but recommended.
+// Supported button types are "Flat" and "Raised"
+class Button {
+    // Sets up the class with the default values.
+    constructor(ID, Type, Label, Icon) {
+        this.Label = (typeof(Label) === "undefined") ? "Button" : Label;
+        this.Icon = (typeof(IconID) === "undefined") ? "" : Icon;
+        this.OnClick = "";
+        this.Ripple = true;
+        this.ID = (typeof(ID) === "undefined") ? "" : ID;
+        this.Type = (typeof(Type) === "undefined") ? this.Type = "Waterfall" : this.Type = Type;
+        this.ParentID = "";
+        this.Object = null;
+        this.MDCObject = null;
+    }
+
+    // Create the button.
+    Create() {
+        // Only execute if the object has not been created.
+        if (this.Object === null) {
+            // Create the main element.
+            var $MainElement = $('<button>', {"class": "mdc-button"});
+
+            // Import the parent element.
+            var ParentElement = $('#' + this.ParentID.toString());
+
+            // Configure the main element.
+            if (this.ID.toString() !== "") $MainElement.id = this.ID.toString();
+            if (this.Label.toString() !== "") $MainElement.text(this.Label.toString());
+            if (this.OnClick.toString() !== "") $MainElement.attr("OnClick", this.OnClick.toString()); 
+
+            // Create icon element, configure and attach to the main element.
+            if (this.Icon.toString() !== "") {
+                $IconElement = $('<i>', {"class": "material-icons mdc-button__icon"}).text(this.Icon.toString());
+                $MainElement.prepend($IconElement);
+            }
+
+            // Apply the selected type to the button.
+            switch (this.Type.toString()) {
+                default:
+                    console.error('The specified type does not exist: ' + this.Type.toString() + ', defaulting to "Raised".');
+                    this.Type = "Raised";
+                case "Raised":
+                    $MainElement.addClass("mdc-button--raised");
+                    break;
+                case "Flat":
+                    break;
+            }
+
+            // Send the main element to the parent element for rendering.
+            ParentElement.append($MainElement);
+
+            // Only apply ripple if enabled.
+            if (this.Ripple) this.MDCObject = mdc.ripple.MDCRipple.attachTo($MainElement[0]);
+
+            // Set the main element to be accessible.
+            this.Object = $MainElement;
+            return true;
+        } else {
+            // If the object has been instantiated, quit execution and give reason.
+            console.error("Could not create, It appears that the button has already been created.");
+            return false;
+        }
+    }
+
+    // Remove the button.
+    Remove() {
+        // Only execute if the object has been created.
+        if (this.Object !== null) {
+            // Remove the object from the DOM.
+            this.Object.remove();
+            // Reset the properties for a new creation of the button.
+            this.Object = null;
+            this.MDCObject = null;
+            // Return true for error checking.
+            return true;
+        } else {
+            // If the object has not been instantiated, quit execution and give reason.
+            console.error("Can't remove the button, it does not exist yet...");
+            return false;
+        }
+    }
+
+    // Toggles the button state and optionally sets it to a specific value.
+    // Optionally if a value is passed to it, it will set it to the bool value of the passed object.
+    ToggleDisabled(OptionalValue) {
+        // Only execute if the object has been created.
+        if (this.Object !== null) {
+            // If the optional parameter is specified, toggle the button's state to the specified value.
+            if (typeof(OptionalValue) !== "undefined") {
+                if (OptionalValue) {
+                    // Disable the button.
+                    this.Object.attr("disabled", "");
+                } else {
+                    // Enable the button.
+                    this.Object.removeAttr("disabled");
+                }
+            // If the optional parameter is not specified, toggle the buttons state to the opposite of the current state.
+            } else {
+                // Checks the current button state and executes based upon that.
+                if (this.Object.attr("disabled") === "") {
+                    // Disable the button.
+                    this.Object.removeAttr("disabled");
+                } else {
+                    // Enable the button.
+                    this.Object.attr("disabled", "");
+                }
+            }
+        }
+    }
+
+    // Manually create a ripple effect on the Menu Item Object.
+    ManualRipple() {
+        // Only execute if the object has been created.
+        if (this.Object !== null) {
+            // only execute if MDC has not been enabled on the object yet.
+            if (this.MDCObject === null) {
+                // Create ripple on the object and save it to the class MDC object property.
+                this.MDCObject = mdc.ripple.MDCRipple.attachTo(this.Object[0]);
+                return true;
+            } else {
+                // If the MDC object has been instantiated, quit execution and give reason.
+                console.error("The MDC component is already initialized. Not applying the ripple for safety...");
+                return false;
+            }
+        } else {
+            // If the Object has not been instantiated, quit reason and give the reason.
+            console.error("Can't instantiate a ripple. The menu item has not been created yet...")
             return false;
         }
     }
