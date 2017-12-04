@@ -373,7 +373,7 @@ class Button {
     // Sets up the class with the default values.
     constructor(ID, Type, Label, Icon) {
         this.Label = (typeof(Label) === "undefined") ? "Button" : Label;
-        this.Icon = (typeof(IconID) === "undefined") ? "" : Icon;
+        this.Icon = (typeof(Icon) === "undefined") ? "" : Icon;
         this.OnClick = "";
         this.Ripple = true;
         this.ID = (typeof(ID) === "undefined") ? "" : ID;
@@ -400,7 +400,7 @@ class Button {
 
             // Create icon element, configure and attach to the main element.
             if (this.Icon.toString() !== "") {
-                $IconElement = $('<i>', {"class": "material-icons mdc-button__icon"}).text(this.Icon.toString());
+                var $IconElement = $('<i>', {"class": "material-icons mdc-button__icon"}).text(this.Icon.toString());
                 $MainElement.prepend($IconElement);
             }
 
